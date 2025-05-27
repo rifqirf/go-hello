@@ -30,7 +30,7 @@ jobs:
             ~/.cache/go-build
           key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-${{ matrix.go-version }}-
+            ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
 
       - name: Run go fmt
         run: go fmt ./...
@@ -41,7 +41,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.52.2
+          version: v1.57.2
 
       - name: Run tests
         run: go test ./... -v -coverprofile=coverage.out
