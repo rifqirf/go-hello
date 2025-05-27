@@ -42,7 +42,7 @@ jobs:
         run: go vet ./...
 
       - name: Run golangci-lint
-        run: golangci-lint run --timeout 5m
+        run: golangci-lint run --timeout=5m
 
       - name: Run tests
         run: go test ./... -v -coverprofile=coverage.out
