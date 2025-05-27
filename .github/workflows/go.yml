@@ -1,0 +1,48 @@
+name: Go CI
+
+on:
+  push:
+    branches: [main, release/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.22, 1.23, 1.24]
+
+    steps:
+      - name: CheckOut code
+        uses: actions/checkout@v3
+      
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+    
+      - name: Cache go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ matrix.go-version }}-
+        
+        - name: Install linting tools
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: Run go fmt
+        run: go fmt ./...
+      
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run golangci-lint
+        run: golangci-lint run --timeout 5m
+
+      - name: Run tests
+        run: go test ./... -v -coverprofile=coverage.out
